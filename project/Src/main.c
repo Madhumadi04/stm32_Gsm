@@ -247,7 +247,7 @@ int main(void)
 			Gsm_SendString("\n");
 			HAL_UART_Transmit(&huart6, Rx_Buffer, len, 1000); 
 			Transfer_cplt = 0;
-			HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_SET); 
+			HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_SET);  //led on
 			if (!(strcmp(Rx_Buffer, "OK")))
 			{
 				HAL_Delay(100);
