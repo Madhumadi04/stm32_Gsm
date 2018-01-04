@@ -94,6 +94,12 @@
     <Filter Include="VisualGDB settings">
       <UniqueIdentifier>{d7ab5049-f80e-47c7-b474-0c774146a28f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source files\Device-specific files\Semihosting/Profiler">
+      <UniqueIdentifier>{d352b1c6-c81d-42b2-a976-a07726791280}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Device-specific files\Semihosting/Profiler">
+      <UniqueIdentifier>{f5fefad3-5715-473a-9e2c-26c4d67a890f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\project\Src\stm32f4xx_it.c">
@@ -240,13 +246,43 @@
     <None Include="stm32.xml">
       <Filter>VisualGDB settings</Filter>
     </None>
-    <ClCompile Include="..\GSM_7100.c">
+    <ClCompile Include="GSM_7100.c">
       <Filter>Source files\STM32Cube HAL</Filter>
     </ClCompile>
+    <ClCompile Include="$(EFP_BASE)\Profiler\FastSemihosting.cpp">
+      <Filter>Source files\Device-specific files\Semihosting/Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="$(EFP_BASE)\Profiler\SamplingProfiler.cpp">
+      <Filter>Source files\Device-specific files\Semihosting/Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="$(EFP_BASE)\Profiler\InstrumentingProfiler.cpp">
+      <Filter>Source files\Device-specific files\Semihosting/Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="$(EFP_BASE)\Profiler\ProfilerRTOS_FreeRTOS.c">
+      <Filter>Source files\Device-specific files\Semihosting/Profiler</Filter>
+    </ClCompile>
+    <ClInclude Include="$(EFP_BASE)\Profiler\SysprogsProfiler.h">
+      <Filter>Header files\Device-specific files\Semihosting/Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="$(EFP_BASE)\Profiler\SmallNumberCoder.h">
+      <Filter>Header files\Device-specific files\Semihosting/Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="$(EFP_BASE)\Profiler\SysprogsProfilerInterface.h">
+      <Filter>Header files\Device-specific files\Semihosting/Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="$(EFP_BASE)\Profiler\ProfilerFreeRTOSHooks.h">
+      <Filter>Header files\Device-specific files\Semihosting/Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="$(EFP_BASE)\Profiler\CustomRealTimeWatches.h">
+      <Filter>Header files\Device-specific files\Semihosting/Profiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\GSM_7100.h">
       <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="GSM_7100.h">
+      <Filter>Header files\STM32Cube HAL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

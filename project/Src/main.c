@@ -39,9 +39,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_hal.h"
-#include "stdbool.h"
-#include "stdio.h"
-#include "string.h"
+#include "GSM_7100.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -51,27 +49,31 @@
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart6;
 DMA_HandleTypeDef hdma_usart2_rx;
+DMA_HandleTypeDef hdma_usart2_tx;
 
-//const char cmd[] = "AT"; 
-char rxdata;
-uint8_t CR_check = 5;
-uint8_t LF_check;
-uint8_t rbyte = 0;
-unsigned char incr, ite, f, temp;
-char Rx_indx, Rx_data[2], Rx_Buffer[100], Transfer_cplt; 		//Variables for call back
-unsigned int len;		
-bool op; //Variables for call back
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 #define		_AT_										"AT\r"
+
+
+ unsigned char incr, ite, f, temp;
+ char Rx_indx, Rx_data[2], Rx_Buffer[100],Null_buf[50];
+ uint8_t CR_check=5;
+ uint8_t LF_check;
+
+char Rx_indx, Rx_data[2], Rx_Buffer[100], Transfer_cplt; 		//Variables for call back
+unsigned char le;
+char buffer[3];
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
-static void MX_USART6_UART_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_USART6_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -81,186 +83,69 @@ static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN 0 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)  
-{
-	/**/
-	uint8_t i;
-	//ite = 1;
-	
-	if(huart->Instance == USART6)  //current UART
-	{
-		incr++;
-		if (Rx_indx == 0) {for (i = 0; i < 100; i++) Rx_Buffer[i] = 0; } 
-		if (ite == 1)
-		{
-				
-			if ((Rx_data[0] != 13)&&(Rx_data[0] != 10))//if received data different from ascii 13 (enter)
-			{
-				//Rx_indx = 0;
-					Rx_Buffer[Rx_indx++] = Rx_data[0];
-				//incr = 0;
-				//	     //add data to Rx_Buffer
-			}
-		
-			if ((Rx_data[0] == 10)&&(f == 1)) 
-			{
-				temp = incr;
-				temp = temp - 1;
-				if (CR_check == temp)
-					LF_check = 1;
-			
-			
-			}
-			if (Rx_data[0] == 13)
-			{
-				CR_check = incr;
-				f = 1;
-			}
-				
-				
-			if (LF_check == 1)
-			{
-					
-				Transfer_cplt = 1;
-				LF_check = 0;
-				CR_check = 5;
-				ite = 0;
-				f = 0;
-				Rx_indx = 0;
-			}
-				
-				
-		}
-
-		if (ite == 0)
-		{
-				
-			if (Rx_data[0] == 13) //if received data different from ascii 13 (enter)
-				{
-					CR_check = incr;
-			
-					//	     //add data to Rx_Buffer
-				}
-			
-			
-			if ((Rx_data[0] == 10)&&(CR_check == (incr) - 1))
-			{
-				LF_check = 1;
-			}
-			
-			if (LF_check == 1)
-			{
-				Rx_indx = 0;
-				incr = 0;
-				LF_check = 0;
-				//CR_check = 5;
-				ite = 1;
-				
-				//Rx_Buffer[Rx_indx++] = Rx_data[0]; 
-			}
-		}
-		
-			
-
-		HAL_UART_Receive_IT(&huart6, Rx_data, 1);      //activate UART receive interrupt every time
-	}
-
-	
-}
 
 
 
 /* USER CODE END 0 */
 
-
-
-
 int main(void)
 {
-	
-	/* USER CODE BEGIN 1 */
 
-	/* USER CODE END 1 */
+  /* USER CODE BEGIN 1 */
 
-	/* MCU Configuration----------------------------------------------------------*/
+  /* USER CODE END 1 */
 
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
-	
+  /* MCU Configuration----------------------------------------------------------*/
 
-	/* USER CODE BEGIN Init */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-	/* USER CODE END Init */
+  /* USER CODE BEGIN Init */
 
-	/* Configure the system clock */
-	SystemClock_Config();
+  /* USER CODE END Init */
 
-	/* USER CODE BEGIN SysInit */
+  /* Configure the system clock */
+  SystemClock_Config();
 
-	/* USER CODE END SysInit */
+  /* USER CODE BEGIN SysInit */
 
-	/* Initialize all configured peripherals */
-	MX_GPIO_Init();
-	MX_DMA_Init();
-	MX_USART6_UART_Init();
-	MX_USART2_UART_Init();
+  /* USER CODE END SysInit */
 
-	/* USER CODE BEGIN 2 */
-	//__HAL_UART_ENABLE_IT(&huart6, UART_IT_TC); 
-	__HAL_UART_ENABLE_IT(&huart6, UART_IT_TC);  // ENABLES INTERRPUT WHEN RECEIVE BUFFER IS NOT EMPTY
-  /* USER CODE END 2 */
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_USART2_UART_Init();
+  MX_USART6_UART_Init();
+
+  /* USER CODE BEGIN 2 */
+	__HAL_UART_ENABLE_IT(&huart6, UART_IT_TC);   // ENABLES INTERRPUT WHEN RECEIVE BUFFER IS NOT EMPTY
 	HAL_UART_Receive_IT(&huart6, Rx_data, 1);  
-	/* Infinite loop */
-	/* USER CODE BEGIN WHILE */
+	/* USER CODE END 2 */
+	init_quectel();
+	HAL_Delay(2000);
+	connect("ABCDEf"); // cLIENT ID for connect packet
+	HAL_Delay(1000);
+  /* USER CODE END 2 */
+	HAL_Delay(500);
+	
+	HAL_Delay(2000);
+	Publishpkt("inTopic", "jjjjj");   // 
+	HAL_Delay(2000);
+	Publishpkt("inTopic", "cfh");
+	Mqtt_subscribe("AA");
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		/* USER CODE END WHILE */
-		/*	  HAL_GPIO_WritePin(GPIOD, LD4_Pin , GPIO_PIN_SET);
-			  HAL_GPIO_WritePin(GPIOD,LD3_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOD,  LD5_Pin , GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_RESET);
-			  HAL_Delay(100);
-			  HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
-			  HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_RESET);
-			  HAL_Delay(100);
-			  HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
-			  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_RESET);
-			  HAL_Delay(100);
-			  HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_SET);
-	  
-			   */
-		HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_RESET); 
-		HAL_Delay(1000);
-		// op= Gsm_SendRaw(_AT_, 3);
-	
-		  if(Transfer_cplt)
-		{
-			//  sprintf(buffer, "%s);
-			  len = strlen(Rx_Buffer);
-			Gsm_SendString("\n");
-			HAL_UART_Transmit(&huart6, Rx_Buffer, len, 1000); 
-			Transfer_cplt = 0;
-			HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_SET);  //led  on
-			if (!(strcmp(Rx_Buffer, "OK")))
-			{
-				HAL_Delay(100);
-				//Gsm_SendString("ok");
-				HAL_Delay(1000);
-			}
-		}
-		// HAL_UART_Transmit_IT(&huart6, (uint8_t*)"hello, world\n", 14);
-	
-	 /* USER CODE BEGIN 3 */
+  /* USER CODE END WHILE */
+		
+
+		HAL_Delay(10);
+		
+		
+  /* USER CODE BEGIN 3 */
 	  
 	}
-	/* USER CODE END 3 */
 
 }
 
@@ -269,72 +154,71 @@ int main(void)
 void SystemClock_Config(void)
 {
 
-	RCC_OscInitTypeDef RCC_OscInitStruct;
-	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+  RCC_OscInitTypeDef RCC_OscInitStruct;
+  RCC_ClkInitTypeDef RCC_ClkInitStruct;
 
-	/**Configure the main internal regulator output voltage 
-	*/
-	__HAL_RCC_PWR_CLK_ENABLE();
+    /**Configure the main internal regulator output voltage 
+    */  __HAL_RCC_PWR_CLK_ENABLE();
 
-	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-	/**Initializes the CPU, AHB and APB busses clocks 
-	*/
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-	RCC_OscInitStruct.PLL.PLLM = 8;
-	RCC_OscInitStruct.PLL.PLLN = 400;
-	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
-	RCC_OscInitStruct.PLL.PLLQ = 8;
-	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-	{
-		_Error_Handler(__FILE__, __LINE__);
-	}
+    /**Initializes the CPU, AHB and APB busses clocks 
+    */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 400;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLQ = 8;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
-	/**Initializes the CPU, AHB and APB busses clocks 
-	*/
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-	                            | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+    /**Initializes the CPU, AHB and APB busses clocks 
+    */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
-	{
-		_Error_Handler(__FILE__, __LINE__);
-	}
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
-	/**Configure the Systick interrupt time 
-	*/
-	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
+    /**Configure the Systick interrupt time 
+    */
+  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
 
-	/**Configure the Systick 
-	*/
-	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+    /**Configure the Systick 
+    */
+  HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
-	/* SysTick_IRQn interrupt configuration */
-	HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+  /* SysTick_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
 /* USART2 init function */
 static void MX_USART2_UART_Init(void)
 {
 
-	huart2.Instance = USART2;
-	huart2.Init.BaudRate = 115200;
-	huart2.Init.WordLength = UART_WORDLENGTH_8B;
-	huart2.Init.StopBits = UART_STOPBITS_1;
-	huart2.Init.Parity = UART_PARITY_NONE;
-	huart2.Init.Mode = UART_MODE_TX_RX;
-	huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-	if (HAL_UART_Init(&huart2) != HAL_OK)
-	{
-		_Error_Handler(__FILE__, __LINE__);
-	}
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
 }
 
@@ -342,18 +226,18 @@ static void MX_USART2_UART_Init(void)
 static void MX_USART6_UART_Init(void)
 {
 
-	huart6.Instance = USART6;
-	huart6.Init.BaudRate = 115200;
-	huart6.Init.WordLength = UART_WORDLENGTH_8B;
-	huart6.Init.StopBits = UART_STOPBITS_1;
-	huart6.Init.Parity = UART_PARITY_NONE;
-	huart6.Init.Mode = UART_MODE_TX_RX;
-	huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart6.Init.OverSampling = UART_OVERSAMPLING_16;
-	if (HAL_UART_Init(&huart6) != HAL_OK)
-	{
-		_Error_Handler(__FILE__, __LINE__);
-	}
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 115200;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
 }
 
@@ -362,13 +246,16 @@ static void MX_USART6_UART_Init(void)
   */
 static void MX_DMA_Init(void) 
 {
-	/* DMA controller clock enable */
-	__HAL_RCC_DMA1_CLK_ENABLE();
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
 
-	/* DMA interrupt init */
-	/* DMA1_Stream5_IRQn interrupt configuration */
-	HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+  /* DMA interrupt init */
+  /* DMA1_Stream5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+  /* DMA1_Stream6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
 
 }
 
@@ -382,23 +269,23 @@ static void MX_DMA_Init(void)
 static void MX_GPIO_Init(void)
 {
 
-	GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct;
 
-	/* GPIO Ports Clock Enable */
-	__HAL_RCC_GPIOH_CLK_ENABLE();
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOD_CLK_ENABLE();
-	__HAL_RCC_GPIOC_CLK_ENABLE();
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
 
-	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOD, LD4_Pin | LD3_Pin | LD5_Pin | LD6_Pin, GPIO_PIN_RESET);
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin, GPIO_PIN_RESET);
 
-	/*Configure GPIO pins : LD4_Pin LD3_Pin LD5_Pin LD6_Pin */
-	GPIO_InitStruct.Pin = LD4_Pin | LD3_Pin | LD5_Pin | LD6_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  /*Configure GPIO pins : LD4_Pin LD3_Pin LD5_Pin LD6_Pin */
+  GPIO_InitStruct.Pin = LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 }
 
@@ -413,12 +300,12 @@ static void MX_GPIO_Init(void)
   */
 void _Error_Handler(char * file, int line)
 {
-	/* USER CODE BEGIN Error_Handler_Debug */
+  /* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 	while (1) 
 	{
 	}
-	/* USER CODE END Error_Handler_Debug */ 
+  /* USER CODE END Error_Handler_Debug */ 
 }
 
 #ifdef USE_FULL_ASSERT
@@ -432,10 +319,10 @@ void _Error_Handler(char * file, int line)
    */
 void assert_failed(uint8_t* file, uint32_t line)
 {
-	/* USER CODE BEGIN 6 */
+  /* USER CODE BEGIN 6 */
 	/* User can add his own implementation to report the file name and line number,
 	  ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-	/* USER CODE END 6 */
+  /* USER CODE END 6 */
 
 }
 

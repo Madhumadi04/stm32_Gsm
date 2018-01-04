@@ -54,7 +54,7 @@
     <DebugMethod>
       <ID>com.sysprogs.arm.openocd</ID>
       <InterfaceID>stlink-v2</InterfaceID>
-      <InterfaceSerialNumber>5&amp;1AA9ADE2&amp;0&amp;4</InterfaceSerialNumber>
+      <InterfaceSerialNumber>5&amp;1AA9ADE2&amp;0&amp;2</InterfaceSerialNumber>
       <Configuration xsi:type="com.visualgdb.edp.openocd.settings">
         <CommandLine>-f interface/stlink-v2.cfg -f target/stm32f4x.cfg -c init -c "reset init"</CommandLine>
         <ExtraParameters>
@@ -76,7 +76,7 @@
       </Configuration>
     </DebugMethod>
     <AutoDetectRTOS>true</AutoDetectRTOS>
-    <SemihostingSupport>Auto</SemihostingSupport>
+    <SemihostingSupport>Enabled</SemihostingSupport>
     <StepIntoEntryPoint>false</StepIntoEntryPoint>
     <ReloadFirmwareOnReset>false</ReloadFirmwareOnReset>
     <ValidateEndOfStackAddress>true</ValidateEndOfStackAddress>
@@ -104,6 +104,7 @@
     <ShowMessageAfterExecuting>true</ShowMessageAfterExecuting>
   </CustomShortcuts>
   <UserDefinedVariables />
+  <ImportedPropertySheets />
   <CodeSense>
     <Enabled>Unknown</Enabled>
     <ExtraSettings>
@@ -115,4 +116,5 @@
     </CodeAnalyzerSettings>
   </CodeSense>
   <BuildContextDirectory>VisualGDB\VisualGDBCache</BuildContextDirectory>
+  <ProgramArgumentsSuggestions />
 </VisualGDBProjectSettings2>

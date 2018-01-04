@@ -32,9 +32,36 @@
   </MCUProperties>
   <BSPSourceFolderName>Device-specific files</BSPSourceFolderName>
   <MCUMakFile>stm32.mak</MCUMakFile>
-  <ReferencedFrameworks />
+  <ReferencedFrameworks>
+    <string>com.sysprogs.embedded.semihosting_and_profiler</string>
+  </ReferencedFrameworks>
   <FrameworkProperties>
-    <Entries />
+    <Entries>
+      <KeyValue>
+        <Key>com.sysprogs.efp.semihosting.buffer_size</Key>
+        <Value>4096</Value>
+      </KeyValue>
+      <KeyValue>
+        <Key>com.sysprogs.efp.semihosting.stdio</Key>
+        <Value>1</Value>
+      </KeyValue>
+      <KeyValue>
+        <Key>com.sysprogs.efp.semihosting.blocking_mode</Key>
+        <Value>1</Value>
+      </KeyValue>
+      <KeyValue>
+        <Key>com.sysprogs.efp.profiling.semihosting_driver</Key>
+        <Value>1</Value>
+      </KeyValue>
+      <KeyValue>
+        <Key>com.sysprogs.efp.profiling.counter</Key>
+        <Value />
+      </KeyValue>
+      <KeyValue>
+        <Key>com.sysprogs.efp.profiling.nosampling</Key>
+        <Value>0</Value>
+      </KeyValue>
+    </Entries>
   </FrameworkProperties>
   <TestFrameworkProperties>
     <Entries />
@@ -45,7 +72,7 @@
     <AllDependencies>
       <ProjectDependency>
         <RelativePath>..\..\project\project.gpdsc</RelativePath>
-        <Timestamp>131575417202563452</Timestamp>
+        <Timestamp>131578270285678596</Timestamp>
       </ProjectDependency>
     </AllDependencies>
     <RootDirectory>
@@ -254,11 +281,11 @@
       <ImportedConfiguration>
         <Settings>
           <IncludeDirectories>
-            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\project\Inc</string>
-            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\project\Drivers\CMSIS\Include</string>
-            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\project\Drivers\CMSIS\Device\ST\STM32F4xx\Include</string>
-            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\project\Drivers\STM32F4xx_HAL_Driver\Inc</string>
-            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\project\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy</string>
+            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\EmbeddedProject1\EmbeddedProject1\..\..\project\Inc</string>
+            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\EmbeddedProject1\EmbeddedProject1\..\..\project\Drivers\CMSIS\Include</string>
+            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\EmbeddedProject1\EmbeddedProject1\..\..\project\Drivers\CMSIS\Device\ST\STM32F4xx\Include</string>
+            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\EmbeddedProject1\EmbeddedProject1\..\..\project\Drivers\STM32F4xx_HAL_Driver\Inc</string>
+            <string>C:\Users\MadhuMadiDhanasingh\source\repos\stm32_Gsm\EmbeddedProject1\EmbeddedProject1\..\..\project\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy</string>
           </IncludeDirectories>
           <PreprocessorMacros>
             <string>$$com.sysprogs.bspoptions.primary_memory$$_layout</string>

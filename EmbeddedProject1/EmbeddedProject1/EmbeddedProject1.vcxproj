@@ -41,8 +41,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\project\Inc;..\..\project\Drivers\CMSIS\Include;..\..\project\Drivers\CMSIS\Device\ST\STM32F4xx\Include;..\..\project\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\project\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy;../../../EmbeddedProject5/EmbeddedProject5;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>flash_layout;STM32F411xE;DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../EmbeddedProject5/EmbeddedProject5;..\..\project\Inc;..\..\project\Drivers\CMSIS\Include;..\..\project\Drivers\CMSIS\Device\ST\STM32F4xx\Include;..\..\project\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\project\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG=1;flash_layout;STM32F411xE;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions />
       <CLanguageStandard />
       <CPPLanguageStandard />
@@ -58,7 +58,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\project\Inc;..\..\project\Drivers\CMSIS\Include;..\..\project\Drivers\CMSIS\Device\ST\STM32F4xx\Include;..\..\project\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\project\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>flash_layout;STM32F411xE;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG=1;RELEASE=1;flash_layout;STM32F411xE;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions />
       <CLanguageStandard />
       <CPPLanguageStandard />
@@ -95,8 +95,9 @@
     <ClCompile Include="..\..\project\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash_ex.c" />
     <ClCompile Include="..\..\project\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash_ramfunc.c" />
     <ClCompile Include="..\..\project\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c" />
-    <ClCompile Include="..\GSM_7100.c" />
+    <ClCompile Include="GSM_7100.c" />
     <ClInclude Include="..\GSM_7100.h" />
+    <ClInclude Include="GSM_7100.h" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\StartupFiles\startup_stm32f411xe.c" />
     <ClInclude Include="..\..\project\Inc\stm32f4xx_it.h" />
@@ -126,5 +127,14 @@
     <None Include="EmbeddedProject1-Debug.vgdbsettings" />
     <None Include="EmbeddedProject1-Release.vgdbsettings" />
     <None Include="stm32.xml" />
+    <ClCompile Include="$(EFP_BASE)\Profiler\FastSemihosting.cpp" />
+    <ClCompile Include="$(EFP_BASE)\Profiler\SamplingProfiler.cpp" />
+    <ClCompile Include="$(EFP_BASE)\Profiler\InstrumentingProfiler.cpp" />
+    <ClCompile Include="$(EFP_BASE)\Profiler\ProfilerRTOS_FreeRTOS.c" />
+    <ClInclude Include="$(EFP_BASE)\Profiler\SysprogsProfiler.h" />
+    <ClInclude Include="$(EFP_BASE)\Profiler\SmallNumberCoder.h" />
+    <ClInclude Include="$(EFP_BASE)\Profiler\SysprogsProfilerInterface.h" />
+    <ClInclude Include="$(EFP_BASE)\Profiler\ProfilerFreeRTOSHooks.h" />
+    <ClInclude Include="$(EFP_BASE)\Profiler\CustomRealTimeWatches.h" />
   </ItemGroup>
 </Project>

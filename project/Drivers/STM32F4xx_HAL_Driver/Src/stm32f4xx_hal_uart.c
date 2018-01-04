@@ -241,6 +241,8 @@ static void UART_SetConfig (UART_HandleTypeDef *huart);
   *                the configuration information for the specified UART module.
   * @retval HAL status
   */
+
+
 HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
 {
   /* Check the UART handle allocation */
@@ -295,6 +297,24 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
   
   return HAL_OK;
 }
+
+
+
+
+
+
+int Gsm_senddata(UART_HandleTypeDef *huart,unsigned char x)
+{
+	huart->Instance->DR = x;
+	return 0;
+}
+
+
+
+
+
+
+
 
 /**
   * @brief  Initializes the half-duplex mode according to the specified
