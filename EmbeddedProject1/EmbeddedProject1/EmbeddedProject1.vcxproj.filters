@@ -102,9 +102,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\project\Src\stm32f4xx_it.c">
-      <Filter>Source files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\project\Src\stm32f4xx_hal_msp.c">
       <Filter>Source files</Filter>
     </ClCompile>
@@ -246,9 +243,6 @@
     <None Include="stm32.xml">
       <Filter>VisualGDB settings</Filter>
     </None>
-    <ClCompile Include="GSM_7100.c">
-      <Filter>Source files\STM32Cube HAL</Filter>
-    </ClCompile>
     <ClCompile Include="$(EFP_BASE)\Profiler\FastSemihosting.cpp">
       <Filter>Source files\Device-specific files\Semihosting/Profiler</Filter>
     </ClCompile>
@@ -276,11 +270,14 @@
     <ClInclude Include="$(EFP_BASE)\Profiler\CustomRealTimeWatches.h">
       <Filter>Header files\Device-specific files\Semihosting/Profiler</Filter>
     </ClInclude>
+    <ClCompile Include="..\..\project\Src\stm32f4xx_it.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="GSM_7100.c">
+      <Filter>Source files\STM32Cube HAL\UART</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\GSM_7100.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="GSM_7100.h">
       <Filter>Header files\STM32Cube HAL</Filter>
     </ClInclude>

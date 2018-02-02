@@ -14,7 +14,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{ABCB24B4-0875-4CDD-B045-87F4B43CEA8A}</ProjectGuid>
     <BSP_ID>com.sysprogs.arm.stm32</BSP_ID>
-    <BSP_VERSION>4.5R2</BSP_VERSION>
+    <BSP_VERSION>4.5R3</BSP_VERSION>
     <InPlaceBSPSubdir />
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -76,7 +76,6 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\project\Src\stm32f4xx_it.c" />
     <ClCompile Include="..\..\project\Src\stm32f4xx_hal_msp.c" />
     <ClCompile Include="..\..\project\Src\main.c" />
     <ClCompile Include="..\..\project\Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c" />
@@ -95,8 +94,8 @@
     <ClCompile Include="..\..\project\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash_ex.c" />
     <ClCompile Include="..\..\project\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash_ramfunc.c" />
     <ClCompile Include="..\..\project\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c" />
+    <ClCompile Include="..\..\project\Src\stm32f4xx_it.c" />
     <ClCompile Include="GSM_7100.c" />
-    <ClInclude Include="..\GSM_7100.h" />
     <ClInclude Include="GSM_7100.h" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F4xxxx\StartupFiles\startup_stm32f411xe.c" />
