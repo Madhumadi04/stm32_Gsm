@@ -72,6 +72,14 @@
 #endif
 void _Error_Handler(char *, int);
 
+typedef struct MQTT_TAB
+{
+char topic[33];
+char message[9];
+char format[9];
+float value;
+} mqtt_tab;	 
+	 
 #define Error_Handler() _Error_Handler(__FILE__, __LINE__)
 #ifdef __cplusplus
 }

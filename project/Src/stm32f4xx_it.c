@@ -34,6 +34,7 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
+#include "stdbool.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -44,9 +45,23 @@ extern DMA_HandleTypeDef hdma_usart2_rx;
 extern DMA_HandleTypeDef hdma_usart2_tx;
 extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart6;
-extern aTxBuffer;
-extern le;
 
+#define	CR		13
+
+#define	LF		10 
+
+// USART1 Receiver buffer & variables
+#define RX2_BUFFER_SIZE 100
+char rx2_buffer[RX2_BUFFER_SIZE];
+char rx2_EOF_chr = CR;
+uint16_t rx2_wr_index, rx2_rd_index;
+volatile uint16_t rx2_counter;
+volatile bool rx2_EOF_rcv=false, rx2_buffer_overflow; 
+volatile char EOF_count;
+// USART1 Transmitter buffer & variables
+#define TX2_BUFFER_SIZE 100
+char tx2_buffer[TX2_BUFFER_SIZE];
+volatile uint16_t tx2_wr_index, tx2_rd_index, tx2_counter;
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
@@ -130,15 +145,51 @@ void DMA1_Stream6_IRQHandler(void)
 /**
 * @brief This function handles USART2 global interrupt.
 */
+// Special characters
+
+
+
+
+
 void USART2_IRQHandler(void)
 {
-  /* USER CODE BEGIN USART2_IRQn 0 */
+		// HAL_UART_IRQHandler(&huart1);
+	char c;
+	uint16_t SRflags = USART2->SR;
 
-  /* USER CODE END USART2_IRQn 0 */
-  HAL_UART_IRQHandler(&huart2);
-  /* USER CODE BEGIN USART2_IRQn 1 */
-//	HAL_UART_Transmit_DMA(&huart2, aTxBuffer, le);
-  /* USER CODE END USART2_IRQn 1 */
+	// TODO: UART error handling
+
+	if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE))
+	{
+		                  // read interrupt
+   c = USART2->DR & 0x00FF;
+		rx2_buffer[rx2_wr_index] = c;
+		if (c == rx2_EOF_chr)
+		{
+			rx2_EOF_rcv = true;
+			EOF_count++;
+		}
+			
+		if (++rx2_wr_index == RX2_BUFFER_SIZE)
+			rx2_wr_index = 0;
+		if (++rx2_counter == RX2_BUFFER_SIZE)
+		{
+			rx2_counter = 0;
+			rx2_buffer_overflow = true;
+		}
+	}
+
+	if (__HAL_UART_GET_IT_SOURCE(&huart2, UART_IT_TXE) && __HAL_UART_GET_FLAG(&huart2, UART_FLAG_TXE))
+		// IT source must be tested not to execute the branch during a reception
+		{   
+			char c;
+			c = tx2_buffer[tx2_rd_index];
+			USART2->DR = c;
+			if (++tx2_rd_index == TX2_BUFFER_SIZE)
+				tx2_rd_index = 0;
+			if (--tx2_counter == 0)
+				__HAL_UART_DISABLE_IT(&huart2, UART_IT_TXE); 	// stop further transmission
+		}
 }
 
 /**
@@ -159,3 +210,78 @@ void USART6_IRQHandler(void)
 
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+int32_t COMReadStr(char *buf, uint32_t buflen)
+{
+	uint32_t nchr = 0;
+	char c, C_COUNT;
+	if (rx2_counter != 0)
+	{
+		__HAL_UART_DISABLE_IT(&huart2, UART_IT_RXNE);
+		for (; buflen > 1; --buflen)		// last char in buffer for '\0'
+			{
+				c = *buf++ = rx2_buffer[rx2_rd_index];
+				++nchr;
+				if (++rx2_rd_index == RX2_BUFFER_SIZE)
+					rx2_rd_index = 0;
+				if (--rx2_counter == 0)
+					break;
+				
+					
+			}
+		__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
+	}
+	*buf = '\0';
+	return nchr;
+}
+
+//-----------------------------------------------------------------------------
+uint32_t COMSendStr(char *s)
+{
+	uint32_t nchr = 0;
+	unsigned char c;
+	while (tx2_counter == TX2_BUFFER_SIZE) ;
+	HAL_Delay(150);
+	__HAL_UART_DISABLE_IT(&huart2, UART_IT_TXE);
+	while (*s != '\0')
+	{	
+		c = *s++;
+		HAL_Delay(50);
+		tx2_buffer[tx2_wr_index] = c;
+		if (++tx2_wr_index == TX2_BUFFER_SIZE)
+			tx2_wr_index = 0;
+		++tx2_counter;
+		++nchr;
+	}
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_TXE);
+	return nchr;
+}
+
+uint32_t COMSendBuf(char *buf, uint32_t size)
+{
+	uint32_t i;
+	while (tx2_counter == TX2_BUFFER_SIZE) ;
+	__HAL_UART_DISABLE_IT(&huart2, UART_IT_TXE);
+	for (i = 0; i < size; i++)
+	{
+		tx2_buffer[tx2_wr_index] = buf[i];
+		if (++tx2_wr_index == TX2_BUFFER_SIZE)
+			tx2_wr_index = 0;
+		++tx2_counter;
+	}
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_TXE);
+	return size;
+}
+
+//-----------------------------------------------------------------------------
+uint32_t COMSendByte(uint8_t data)
+{
+	if (tx2_counter == TX2_BUFFER_SIZE)
+		return 0;	// when buffer is full returns 0
+	__HAL_UART_DISABLE_IT(&huart2, UART_IT_TXE);
+	tx2_buffer[tx2_wr_index] = (char)data;
+	if (++tx2_wr_index == TX2_BUFFER_SIZE)
+		tx2_wr_index = 0;
+	++tx2_counter;
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_TXE);
+	return 1;	// always only 1 byte
+}

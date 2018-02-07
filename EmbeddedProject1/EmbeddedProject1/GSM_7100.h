@@ -8,6 +8,12 @@
 #define		Portno										"1883,"
 #define	 MAIN_RX_BUF_LEN									55
 #define	 main_rx_buf									&Mainrxbuf
+#define _AT_ "AT\r"
+#define _CLOSEPORT_ "AT+QICLOSE=0\r"
+#define _TCPCONFIG_ "AT+QICSGP=1,1,\"internet.t-mobile.cz\",\"\",\"\",1\r"
+#define _OPENPORT_ "AT+QIOPEN=1,0,\"TCP\",\"playground.g4t.io\",1884,0,1\r"
+#define _PUBLISH_ "Publish error"
+
 char Mainrxbuf[MAIN_RX_BUF_LEN];
 typedef struct
 {
@@ -21,14 +27,14 @@ bool Gsm_SendRaw(uint8_t *, uint16_t);
 bool	Gsm_SendString(char *);
 bool flush_buf();
 bool Test_AT_send();
-bool Test_AT_send_TEST();
-bool close_socket();
-bool unlock_sim();
-bool Configure_TCP();
-bool Open_Port();
+char Test_AT_send_TEST();
+char close_socket();
+char Configure_TCP();
+char Open_Port();
 bool conn_pkt();
 bool pub_pkt();
 bool connect(unsigned char *clientID);
-bool Publishpkt(unsigned char *topic, unsigned char *message);
+char Publishpkt(unsigned char i);
 bool Mqtt_subscribe(unsigned char *topic);
-bool gsm_timeout(uint32_t tickstart, uint32_t timeout);
+bool gsm_timeout(unsigned char *cmd, uint32_t tickstart, uint32_t timeout);
+bool ATCommand_Response(unsigned char *cmd, uint32_t timeout);

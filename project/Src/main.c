@@ -40,12 +40,13 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "GSM_7100.h"
-
+#include "UARTXinOu.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart6;
 DMA_HandleTypeDef hdma_usart2_rx;
@@ -54,18 +55,28 @@ DMA_HandleTypeDef hdma_usart2_tx;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 #define		_AT_										"AT\r"
+#define  temperature1 "EdgeFS1/1wire/temperature/th1"
+#define  temperature2 "EdgeFS1/1wire/temperature/th2"
+ 
+char pub = 123;
+
+char ClientID[] = "EdgeFS1";
 
 
- unsigned char incr, ite, f, temp;
- char Rx_indx, Rx_data[2], Rx_Buffer[100],Null_buf[50];
- uint8_t CR_check=5;
- uint8_t LF_check;
-
-char Rx_indx, Rx_data[2], Rx_Buffer[100], Transfer_cplt; 		//Variables for call back
-unsigned char le;
-char buffer[3];
 
 
+mqtt_tab mqtt[10] = {
+	{ "EdgeFS1/1wire/temperature/th1", "mmm", "%+07.2f", 0.0 },
+	{ "EdgeFS1/1wire/temperature/th2", "hhh", "%+07.2f", 0.0 },
+	{ "EdgeFS1/1wire/temperature/th3", "", "%+07.2f", 0.0 },
+	{ "EdgeFS1/ADI/chan1/voltage", "", "%06.3f", 0.0 },
+	{ "EdgeFS1/ADI/chan2/current", "", "%06.3f", 0.0 },
+	{ "EdgeFS1/ADI/chan3/logical", "", "%1.0f", 0.0 },
+	{ "EdgeFS1/ADI/chan4/logical", "", "%1.0f", 0.0 },
+	{ "EdgeFS1/RS232/dmm/voltage", "", "%06.2f", 0.0 },
+	{ "EdgeFS1/DO/chan1", "", "%1.0f", 0.0 },
+	{ "EdgeFS1/DO/chan3", "", "%1.0f", 0.0 }
+};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -83,14 +94,14 @@ static void MX_USART6_UART_Init(void);
 /* USER CODE BEGIN 0 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 
-
-
+char topic[] = "EdgeFS1/1wire/temperature/th1";
+unsigned char AT1[] = "AT\r";
 
 /* USER CODE END 0 */
 
 int main(void)
 {
-
+	char a = 123;
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -118,29 +129,55 @@ int main(void)
   MX_USART6_UART_Init();
 
   /* USER CODE BEGIN 2 */
+
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
 	__HAL_UART_ENABLE_IT(&huart6, UART_IT_TC);   // ENABLES INTERRPUT WHEN RECEIVE BUFFER IS NOT EMPTY
-	HAL_UART_Receive_IT(&huart6, Rx_data, 1);  
+//	HAL_UART_Receive_IT(&huart6, Rx_data, 1);  
 	/* USER CODE END 2 */
-	init_quectel();
-	HAL_Delay(2000);
-	connect("ABCDEf"); // cLIENT ID for connect packet
-	HAL_Delay(1000);
-  /* USER CODE END 2 */
-	HAL_Delay(500);
 	
-	HAL_Delay(2000);
-	Publishpkt("inTopic", "jjjjj");   // 
-	HAL_Delay(2000);
-	Publishpkt("inTopic", "cfh");
-	Mqtt_subscribe("AA");
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
+	HAL_Delay(300);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
+	HAL_Delay(100);
+	
+	init_quectel();
+	
+	//Only if TCP socket is open successfully it will come of of this function.
+
+	//connect("ABCDEf"); // cLIENT ID for connect packet
+
+  /* USER CODE END 2 */
+	
+	//Publishpkt("inTopic", "jjjjj");   // 
+
+	//Publishpkt("inTopic", "cfh");
+	//Mqtt_subscribe("AA");
   /* Infinite loop */
+
+	
+	
+	
+	connect(ClientID);
+	
+	flush_buf();
+	
+	
+	flush_buf();
+	//*main_rx_buf[0] = '\0';
+	//flush_buf();
+	//Mqtt_subscribe("aa");
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
   /* USER CODE END WHILE */
-		
-
-		HAL_Delay(10);
+		//a=Publishpkt_num(temperature1, pub);
+		//Publishpkt_num(&topic, );
+	
+		for(int i = 0 ; i < 2 ; i++)
+		{
+			a= Publishpkt(i);
+		}
+	
 		
 		
   /* USER CODE BEGIN 3 */
@@ -158,7 +195,8 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
 
     /**Configure the main internal regulator output voltage 
-    */  __HAL_RCC_PWR_CLK_ENABLE();
+    */ 
+	__HAL_RCC_PWR_CLK_ENABLE();
 
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
@@ -278,14 +316,25 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin, GPIO_PIN_RESET);
+  //HAL_GPIO_WritePin(GPIOD, LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : LD4_Pin LD3_Pin LD5_Pin LD6_Pin */
-  GPIO_InitStruct.Pin = LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  //GPIO_InitStruct.Pin = LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin;
+  //GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  //GPIO_InitStruct.Pull = GPIO_NOPULL;
+  //GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  //HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+	//GPIO_InitTypeDef GPIO_InitStruct;
+	
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1 | GPIO_PIN_2, GPIO_PIN_RESET);
+	/*Configure GPIO pins : PC1 PC2 */
+	GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	
+	
 
 }
 

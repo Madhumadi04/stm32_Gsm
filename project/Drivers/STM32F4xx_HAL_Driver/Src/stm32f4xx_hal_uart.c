@@ -303,12 +303,6 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
 
 
 
-int Gsm_senddata(UART_HandleTypeDef *huart,unsigned char x)
-{
-	huart->Instance->DR = x;
-	return 0;
-}
-
 
 
 
